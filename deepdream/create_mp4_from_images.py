@@ -57,5 +57,6 @@ if __name__ == "__main__":
         source_img_paths = removeShapeFromList(target_shapes[-1], source_img_paths)
         print("The output video is {}".format(output_mov_path))
         print('{} remaining sources:'.format(len(source_img_paths)))
+    # now remove most all images
     print("Ending program create_mp4_from_images")
     print("-"*20)
