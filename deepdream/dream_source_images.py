@@ -229,6 +229,9 @@ def run_deep_dream_with_octaves(img, steps_per_octave=100, step_size=0.01,
             base_shape[:-1]), tf.float32)*(octave_scale**octave)
         new_size = tf.cast(new_size, tf.int32)
         img = tf.image.resize(img, new_size)
+        if octave == octaves[-1]:
+            print("doubing the steps for final octave")
+            steps_per_octave = steps_per_octave * 2
         for step in range(steps_per_octave):
             gradients = get_tiled_gradients(img, new_size)
             img = img + gradients*step_size
@@ -279,6 +282,11 @@ parser.add_argument('-md', '--max_dim', choices=range(64, 1920), default=512, ty
 parser.add_argument('-ol', '--octaves', default="-2, -1, 0, 1, 2", type=str,
                     help='list of ints representing which octaves program will run through, default is "-2, -1, 0, 1, 2"')
 
+# this needes to be a list of ints
+parser.add_argument('-mode', '--mode', default="frost", type=str, choices=["frost", "eyes", "standard", "test"],
+                    help='what layers from the model will be used for generating the image, default is "standard" while other options\
+                        include "test", "dim_blur", "waves", "ripples", "hair", "spirals", frost", "eyes", "pools" and "pools2"')
+
 if __name__ == "__main__":
     args = parser.parse_args()
     print("command line arguments parsed, {}".format(args))
@@ -297,10 +305,36 @@ if __name__ == "__main__":
     print("output name is: {}".format(output_name))
 
     base_model = tf.keras.applications.InceptionV3(
-        include_top=False, weights='imagenet')
+        include_top=False, weights='imagenet',
+        classifier_activation='softmax',
+        )
 
     # Maximize the activations of these layers
-    names = ['mixed3', 'mixed5']
+    # names = ['mixed3', 'mixed5']
+    print(base_model.summary())
+    if args.mode == "frost":
+        names = ['mixed5']
+    elif args.mode == 'eyes':
+        names = ['mixed3']
+    elif args.mode == 'standard':
+        names = ['mixed3', 'mixed5']
+    elif args.mode == 'dim_blur':
+        names = ['mixed7']
+    elif args.mode == 'waves':
+        names = ['mixed1']
+    elif args.mode == 'ripples':
+        names = ['mixed2']
+    elif args.mode == 'hair':
+        names = ['mixed4']
+    elif args.mode == 'spiral':
+        names = ['mixed6']
+    elif args.mode == 'pools':
+        names = ['mixed8']
+    elif args.mode == 'pools2':
+        names = ['mixed9']
+    elif args.mode == 'test':
+        names = ['mixed2', 'mixed3', 'mixed4']
+    
     layers = [base_model.get_layer(name).output for name in names]
 
     # Create the feature extraction model
