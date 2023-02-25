@@ -1,3 +1,6 @@
 [submodule "neural_art_bots"]
 	path = neural_art_bots
 	url = https://github.com/nathanshaw/neural_art_bots.git
+[submodule "chat_gpt"]
+	path = chat_gpt
+	url = https://github.com/nathanshaw/chat_gpt.git
