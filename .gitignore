@@ -9,3 +9,4 @@ best_outputs
 stable_diffusion/previously_processed_images
 tensor_venv
 *.mp4
+*__pycache__
