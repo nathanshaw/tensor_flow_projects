@@ -115,8 +115,11 @@ def adjustGrid(num, cmax=5):
 
 def generateOutputNames(prompts):
     time_str = datetime.now().strftime("%Y_%m_%d_%H_")
-    prompt_names = [os.getcwd() + "/output_images/" + time_str +
-                    name.replace(' ', '_')[:40] + ".png" for name in prompts]
+    prompt_names = []
+    for name in prompts:
+        for b in range(batch_size)
+            prompt_names.append(os.getcwd() + "/output_images/" + time_str +
+                    name.replace(' ', '_')[:40] + "_" + str(b)".png"
     return prompt_names
 
 def createModel(img_width, img_height, jit_compile=True):
@@ -136,24 +139,23 @@ def main(arg_dict):
     plot_output = arg_dict["plot_output"]
 
     model = createModel(output_width, output_height)
-    images = []
-    #########################################################
-    for prompt in prompts:
-        images.append(model.text_to_image(
-            prompt,
-            seed=seed,
-            num_steps=steps,
-            batch_size=batch_size
-        ))
-    keras.backend.clear_session()  # Clear session to preserve memory
-
     # for automatically labling each output file uniquely
     output_names = generateOutputNames(prompts)
+    #########################################################
+    for prompt in prompts:
+        for batch in batch_size:
+            image = model.text_to_image(
+                prompt,
+                seed=seed,
+                num_steps=steps,
+                batch_size=batch_size
+            )
+            keras.backend.clear_session()  # Clear session to preserve memory
+            save_image(image, output_names[idx])
 
     if (plot_output):
-        plot_images(images)
-
-    save_images(images, output_names)
+        plot_images(image)
+      
     end_time = time.time()
     runtime = end_time - start_time
     print("Total function runtime is {} with {} as parameters".format(runtime, arg_dict))
