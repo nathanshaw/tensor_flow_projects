@@ -42,11 +42,8 @@ def save_images(images, titles):
         tf.keras.utils.save_img(titles[i], images[i])
 
 
-def save_image(image):
-    global img_num
-    tf.keras.utils.save_img(output_name + str(img_num) +
-                            ".png", np.squeeze(image, 0))
-    img_num = img_num + 1
+def save_image(image, title):
+    tf.keras.utils.save_img(title, np.squeeze(image, 0))
 
 
 def plot_images(images):
@@ -137,6 +134,10 @@ def main(arg_dict):
 
     model = createModel(output_width, output_height)
     images = []
+    idx = 0
+
+    # for automatically labling each output file uniquely
+    output_names = generateOutputNames(prompts)
     #########################################################
     for prompt in prompts:
         images.append(model.text_to_image(
@@ -145,15 +146,13 @@ def main(arg_dict):
             num_steps=steps,
             batch_size=batch_size
         ))
+        save_image(images[-1], output_names[idx])
+        idx += 1
     keras.backend.clear_session()  # Clear session to preserve memory
-
-    # for automatically labling each output file uniquely
-    output_names = generateOutputNames(prompts)
 
     if (plot_output):
         plot_images(images)
 
-    save_images(images, output_names)
     end_time = time.time()
     runtime = end_time - start_time
     print("Total function runtime is {} with {} as parameters".format(runtime, arg_dict))
